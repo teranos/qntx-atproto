@@ -5,17 +5,18 @@ import (
 	"strings"
 
 	"github.com/teranos/QNTX/ats/types"
-	"github.com/teranos/QNTX/internal/named"
+	errors "github.com/teranos/sacred-error"
 )
 
 // by is the DID an attestation names as having made it; a DID naming nothing
-// is refused, naming what it was.
+// is refused, naming what it was. types.ActorsOf is what QNTX gives a plugin
+// outside its module, which cannot make a named.Text itself.
 func by(what, did string) (types.Authors, error) {
-	actor, err := named.TextOf(what, did)
+	actor, err := types.ActorsOf(did)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "%s names nothing", what)
 	}
-	return types.ActorNamed(actor), nil
+	return actor, nil
 }
 
 // collectionFromURI extracts the collection from an AT URI.

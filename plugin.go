@@ -8,11 +8,9 @@
 //
 // This plugin runs as an external gRPC process. Build with:
 //
-//	go build ./qntx-atproto/cmd/qntx-atproto-plugin
+//	CGO_ENABLED=0 go build ./cmd/qntx-atproto-plugin
 //
-// Then install to ~/.qntx/plugins/ or add to plugin.paths in am.toml.
-//
-// TODO(#611): Separate into own Go module (currently uses root go.mod)
+// A node adds, builds and runs it from its record: QNTX ADR-002.
 package qntxatproto
 
 import (
@@ -51,7 +49,7 @@ func NewPlugin() *Plugin {
 	return &Plugin{
 		Base: plugin.NewBase(plugin.Metadata{
 			Name:        "atproto",
-			Version:     "0.4.7",
+			Version:     "0.4.8",
 			QNTXVersion: ">= 0.1.0",
 			Description: "AT Protocol integration (Bluesky) with auto-scheduled timeline sync",
 			Author:      "QNTX Team",

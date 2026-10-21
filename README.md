@@ -4,28 +4,37 @@ AT Protocol (Bluesky) domain plugin for QNTX. Uses [bluesky-social/indigo](https
 
 ## Build
 
+This is its own Go module, `github.com/teranos/qntx-atproto`, requiring `github.com/teranos/QNTX` (see `go.mod`). It is pure Go: QNTX's cgo storage is the node's, not the plugin's, so it builds with `CGO_ENABLED=0`.
+
 ```bash
-go build ./qntx-atproto/cmd/qntx-atproto-plugin
+make build     # bin/qntx-atproto-plugin
+make install   # ~/.qntx/plugins/qntx-atproto-plugin
 ```
 
-Install the binary to `~/.qntx/plugins/` or a path listed in `[plugin].paths` in your `am.toml`.
+`flake.nix` pins the nixpkgs the node builds with (`nix shell --inputs-from <this repo> nixpkgs#go`, ADR-002) and gives `nix develop` a shell with go and make.
 
 ## Configuration
 
-Add to `am.toml`:
+The plugin is its record on the node ([QNTX ADR-002](https://github.com/teranos/QNTX/blob/main/docs/adr/ADR-002-plugin-configuration.md)): `plugins_add` this repository's URL, then `PUT /api/plugins/atproto/config` with the plugin's keys:
 
-```toml
-[plugin]
-enabled = ["atproto"]
-paths = ["~/.qntx/plugins"]
+| Key | |
+|---|---|
+| `pds_host` | `https://bsky.social` when unset |
+| `identifier` | Handle or DID |
+| `app_password` | Generate at Settings > App Passwords |
+| `timeline_sync_interval_seconds` | Auto-sync the timeline this often; 0 disables |
+| `timeline_sync_limit` | Posts per sync (1-100) |
 
-[atproto]
-pds_host = "https://bsky.social"                # Optional, defaults to bsky.social
-identifier = "you.bsky.social"                   # Handle or DID
-app_password = "xxxx-xxxx-xxxx-xxxx"             # Generate at Settings > App Passwords
-timeline_sync_interval_seconds = 7200            # Auto-sync timeline every 2 hours (0 = disabled)
-timeline_sync_limit = 50                         # Posts per sync (1-100)
-```
+and QNTX's `build.*` keys, so the node builds it from this repository:
+
+| Key | Value |
+|---|---|
+| `build.core` | `github.com/teranos/qntx-atproto@main` |
+| `build.packages` | `go` |
+| `build.command` | `CGO_ENABLED=0 go build -o bin/qntx-atproto-plugin ./cmd/qntx-atproto-plugin` |
+| `build.output` | `bin/qntx-atproto-plugin` |
+
+ADR-002 names a plugin after the last segment of its repository URL. This repository is `qntx-atproto` and the plugin's `Metadata().Name` is `atproto`.
 
 The plugin works without credentials for handle resolution. Authentication is required for timeline, posting, follows, likes, and notifications.
 
@@ -87,12 +96,7 @@ Timeline sync creates attestations for posts appearing in your home feed. This e
 
 **Automatic scheduling (recommended):**
 
-Configure in `am.toml`:
-```toml
-[atproto]
-timeline_sync_interval_seconds = 7200  # Sync every 2 hours (0 = disabled)
-timeline_sync_limit = 50               # Posts per sync (1-100)
-```
+Set `timeline_sync_interval_seconds` and `timeline_sync_limit` in the plugin's record (Configuration above).
 
 The plugin automatically creates a Pulse schedule when `timeline_sync_interval_seconds > 0`. No API calls needed!
 

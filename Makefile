@@ -2,6 +2,9 @@
 
 PREFIX ?= $(HOME)/.qntx
 
+# qntx-atproto is pure Go; QNTX's cgo storage is the node's, not the plugin's.
+export CGO_ENABLED = 0
+
 build: ## Build AT Protocol plugin binary
 	@echo "Building qntx-atproto-plugin..."
 	@go build -o bin/qntx-atproto-plugin ./cmd/qntx-atproto-plugin
