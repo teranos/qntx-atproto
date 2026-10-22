@@ -1,10 +1,10 @@
-# qntx-atproto
+# atproto
 
 AT Protocol (Bluesky) domain plugin for QNTX. Uses [bluesky-social/indigo](https://github.com/bluesky-social/indigo) for XRPC communication.
 
 ## Build
 
-This is its own Go module, `github.com/teranos/qntx-atproto`, requiring `github.com/teranos/QNTX` (see `go.mod`). It is pure Go: QNTX's cgo storage is the node's, not the plugin's, so it builds with `CGO_ENABLED=0`.
+This is its own Go module, `github.com/teranos/atproto`, requiring `github.com/teranos/QNTX` (see `go.mod`). It is pure Go: QNTX's cgo storage is the node's, not the plugin's, so it builds with `CGO_ENABLED=0`.
 
 ```bash
 make build     # bin/qntx-atproto-plugin
@@ -29,12 +29,12 @@ and QNTX's `build.*` keys, so the node builds it from this repository:
 
 | Key | Value |
 |---|---|
-| `build.core` | `github.com/teranos/qntx-atproto@main` |
+| `build.core` | `github.com/teranos/atproto@main` |
 | `build.packages` | `go` |
 | `build.command` | `CGO_ENABLED=0 go build -o bin/qntx-atproto-plugin ./cmd/qntx-atproto-plugin` |
 | `build.output` | `bin/qntx-atproto-plugin` |
 
-ADR-002 names a plugin after the last segment of its repository URL. This repository is `qntx-atproto` and the plugin's `Metadata().Name` is `atproto`.
+ADR-002 names a plugin after the last segment of its repository URL: this repository is `atproto`, and so is the plugin's `Metadata().Name`.
 
 The plugin works without credentials for handle resolution. Authentication is required for timeline, posting, follows, likes, and notifications.
 

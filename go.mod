@@ -1,4 +1,4 @@
-module github.com/teranos/qntx-atproto
+module github.com/teranos/atproto
 
 go 1.25.0
 
